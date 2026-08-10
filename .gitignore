@@ -1,3 +1,4 @@
-.png
+*.png
 .env
-.csv
+*.csv
+__pycache__
