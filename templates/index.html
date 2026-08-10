@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Data</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #ffffff;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #333;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #1e1e1e;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #121212;
+        }
+
+        tr:hover {
+            background-color: #2a2a2a;
+        }
+
+        th {
+            background-color: #252525;
+            color: #00e676;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Trading Data Overview</h2>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Date</th>
+                    <th>Close Price</th>
+                    <th>SMA20</th>
+                    <th>SMA50</th>
+                    <th>Currently in Position?</th>
+                    <th>New Signal Today?</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr>
+                    <td>{{ row['Ticker'] }}</td>
+                    <td>{{ row['Date'] }}</td>
+                    <td>{{ row['Close Price'] }}</td>
+                    <td>{{ row['SMA_20'] }}</td>
+                    <td>{{ row['SMA_50'] }}</td>
+                    <td>{{ row['Currently In Position?'] }}</td>
+                    <td>{{ row['New Signal Today'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
