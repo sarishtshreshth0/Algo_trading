@@ -15,6 +15,36 @@
 
         h2 {
             color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .filter-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-container label {
+            font-weight: bold;
+            color: #00e676;
+        }
+
+        .filter-container select,
+        .filter-container input {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #444;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .filter-container select:focus,
+        .filter-container input:focus {
+            border-color: #00e676;
         }
 
         table {
@@ -47,13 +77,42 @@
             color: #00e676;
             font-weight: bold;
         }
+
+        .no-records {
+            display: none;
+            color: #ff5252;
+            margin-top: 15px;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
     <h2>Trading Data Overview</h2>
+
+    <div class="filter-container">
+        <div>
+            <label for="tickerSelect">Select Ticker:</label>
+            <select id="tickerSelect" onchange="onFilterChange()">
+                <option value="ALL">All Tickers</option>
+                {% set tickers = [] %}
+                {% for row in data %}
+                {% if row['Ticker'] not in tickers %}
+                {% set _ = tickers.append(row['Ticker']) %}
+                <option value="{{ row['Ticker'] }}">{{ row['Ticker'] }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="tickerInput">Search Ticker:</label>
+            <input type="text" id="tickerInput" placeholder="Type ticker name..." onkeyup="onInputChange()" />
+        </div>
+    </div>
+
     <div style="overflow-x:auto;">
-        <table>
+        <table id="dataTable">
             <thead>
                 <tr>
                     <th>Ticker</th>
@@ -67,8 +126,8 @@
             </thead>
             <tbody>
                 {% for row in data %}
-                <tr>
-                    <td>{{ row['Ticker'] }}</td>
+                <tr data-ticker="{{ row['Ticker'] }}">
+                    <td class="ticker-cell">{{ row['Ticker'] }}</td>
                     <td>{{ row['Date'] }}</td>
                     <td>{{ row['Close Price'] }}</td>
                     <td>{{ row['SMA_20'] }}</td>
@@ -79,7 +138,80 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div id="noRecords" class="no-records">No data found for selected ticker.</div>
     </div>
+
+    <script>
+        function filterTable(filterValue) {
+            const val = filterValue.trim().toUpperCase();
+            const rows = document.querySelectorAll('#dataTable tbody tr');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const ticker = (row.getAttribute('data-ticker') || '').toUpperCase();
+                if (val === 'ALL' || val === '' || ticker.includes(val)) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            document.getElementById('noRecords').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        function onFilterChange() {
+            const selectVal = document.getElementById('tickerSelect').value;
+            document.getElementById('tickerInput').value = selectVal === 'ALL' ? '' : selectVal;
+
+            // Update URL hash / slug
+            if (selectVal !== 'ALL') {
+                window.location.hash = selectVal;
+            } else {
+                history.replaceState(null, null, ' ');
+            }
+            filterTable(selectVal);
+        }
+
+        function onInputChange() {
+            const inputVal = document.getElementById('tickerInput').value;
+            document.getElementById('tickerSelect').value = 'ALL';
+            if (inputVal) {
+                window.location.hash = inputVal;
+            } else {
+                history.replaceState(null, null, ' ');
+            }
+            filterTable(inputVal);
+        }
+
+        // Auto-filter on load based on URL hash (slug) or search param
+        window.addEventListener('DOMContentLoaded', () => {
+            let initialFilter = '';
+
+            // Read hash e.g. #RELIANCE.NS
+            if (window.location.hash) {
+                initialFilter = window.location.hash.substring(1);
+            } else {
+                // Read URL query parameter e.g. ?ticker=RELIANCE.NS
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('ticker')) {
+                    initialFilter = urlParams.get('ticker');
+                }
+            }
+
+            if (initialFilter) {
+                document.getElementById('tickerInput').value = initialFilter;
+                const selectEl = document.getElementById('tickerSelect');
+                for (let option of selectEl.options) {
+                    if (option.value.toUpperCase() === initialFilter.toUpperCase()) {
+                        selectEl.value = option.value;
+                        break;
+                    }
+                }
+                filterTable(initialFilter);
+            }
+        });
+    </script>
 </body>
 
-</html>
+</html>
