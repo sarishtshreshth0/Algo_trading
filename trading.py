@@ -61,31 +61,32 @@ def check_signal(ticker):
     }
 
 
-print(f"Signal Check — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-print("=" * 70)
+if __name__ == '__main__':
+    print(f"Signal Check — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    print("=" * 70)
 
-results = []
-for ticker in WATCHLIST:
-    r = check_signal(ticker)
-    if r:
-        make_data(r)
-        results.append(r)
-        marker = ""
-        if r["New Signal Today"] == "BUY":
-            marker = "  🟢 NEW BUY SIGNAL — spreadsheet mein note karo!"
-        elif r["New Signal Today"] == "SELL":
-            marker = "  🔴 NEW SELL SIGNAL — spreadsheet mein note karo!"
-        print(f"\n{r['Ticker']}{marker}")
-        print(f"  Close: ₹{r['Close Price']}  |  SMA20: ₹{r['SMA_20']}  |  SMA50: ₹{r['SMA_50']}")
-        print(f"  Position status: {r['Currently In Position?']}")
+    results = []
+    for ticker in WATCHLIST:
+        r = check_signal(ticker)
+        if r:
+            make_data(r)
+            results.append(r)
+            marker = ""
+            if r["New Signal Today"] == "BUY":
+                marker = "  🟢 NEW BUY SIGNAL — spreadsheet mein note karo!"
+            elif r["New Signal Today"] == "SELL":
+                marker = "  🔴 NEW SELL SIGNAL — spreadsheet mein note karo!"
+            print(f"\n{r['Ticker']}{marker}")
+            print(f"  Close: ₹{r['Close Price']}  |  SMA20: ₹{r['SMA_20']}  |  SMA50: ₹{r['SMA_50']}")
+            print(f"  Position status: {r['Currently In Position?']}")
 
-print("\n" + "=" * 70)
-new_signals = [r for r in results if r["New Signal Today"] != "-- no change --"]
-if new_signals:
-    print(f"\n{len(new_signals)} naya signal mila aaj! Upar 🟢/🔴 wale dekho.")
-else:
-    print("\nAaj koi naya signal nahi aaya kisi bhi stock mein.")
+    print("\n" + "=" * 70)
+    new_signals = [r for r in results if r["New Signal Today"] != "-- no change --"]
+    if new_signals:
+        print(f"\n{len(new_signals)} naya signal mila aaj! Upar 🟢/🔴 wale dekho.")
+    else:
+        print("\nAaj koi naya signal nahi aaya kisi bhi stock mein.")
 
-print("\nReminder: Ye sirf paper trading / learning ke liye hai.")
-print("Har signal ko apni spreadsheet mein Date, Ticker, Price ke saath note karo.")
-print('dataset function is called' , make_csv(data))
+    print("\nReminder: Ye sirf paper trading / learning ke liye hai.")
+    print("Har signal ko apni spreadsheet mein Date, Ticker, Price ke saath note karo.")
+    print('dataset function is called', make_csv(data))
