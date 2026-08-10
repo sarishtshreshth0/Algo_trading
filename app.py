@@ -1,7 +1,7 @@
 import csv
 import os
 from flask import Flask, render_template
-from trading import WATCHLIST, check_signal
+from trading import WATCHLIST, check_signal, get_historical_signals
 
 app = Flask(__name__)
 
@@ -17,16 +17,14 @@ def home():
             reader = csv.DictReader(f)
             current = list(reader)
     
-    # Fallback if CSV is empty or not found: compute signals live
+    # Fallback: compute last 30 days of historical signals live if CSV is missing/empty
     if not current:
-        for ticker in WATCHLIST:
-            signal_info = check_signal(ticker)
-            if signal_info:
-                current.append(signal_info)
+        current = get_historical_signals(WATCHLIST, days=30)
 
     return render_template('index.html', data=current)
 
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
 

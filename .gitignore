@@ -1,5 +1,6 @@
 *.png
 .env
-*.csv
+# *.csv
+!trading_data.csv
 __pycache__/
-*.py[cod]
+*.py[cod]

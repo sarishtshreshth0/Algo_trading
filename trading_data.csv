@@ -1,0 +1,7 @@
+Ticker,Date,Close Price,SMA_20,SMA_50,Currently In Position?,New Signal Today
+RELIANCE.NS,2026-08-10,1327.3,1298.96,1300.47,NO,-- no change --
+TCS.NS,2026-08-10,2425.7,2328.06,2205.53,YES (SMA20 > SMA50),-- no change --
+INFY.NS,2026-08-10,1183.0,1115.97,1103.32,YES (SMA20 > SMA50),-- no change --
+HDFCBANK.NS,2026-08-10,731.0,759.33,771.29,NO,-- no change --
+ITC.NS,2026-08-10,282.65,283.09,284.96,NO,-- no change --
+MOTHERSON.NS,2026-08-10,167.99,149.37,146.71,YES (SMA20 > SMA50),-- no change --

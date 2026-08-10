@@ -61,6 +61,58 @@ def check_signal(ticker):
     }
 
 
+def get_historical_signals(watchlist=WATCHLIST, days=30):
+    all_rows = []
+    for ticker in watchlist:
+        try:
+            df = yf.download(ticker, period=f"{LOOKBACK_DAYS}d", progress=False)
+            if df.empty or len(df) < LONG_WINDOW + 5:
+                continue
+            df = df[["Close"]].copy()
+            df.columns = ["Close"]
+            df["SMA_short"] = df["Close"].rolling(SHORT_WINDOW).mean()
+            df["SMA_long"] = df["Close"].rolling(LONG_WINDOW).mean()
+            
+            recent_df = df.iloc[-days:]
+            for idx in range(len(recent_df)):
+                row_idx = len(df) - days + idx
+                if row_idx < 1:
+                    continue
+                curr = df.iloc[row_idx]
+                prev = df.iloc[row_idx - 1]
+                
+                curr_above = curr["SMA_short"] > curr["SMA_long"]
+                prev_above = prev["SMA_short"] > prev["SMA_long"]
+                
+                sig = None
+                if curr_above and not prev_above:
+                    sig = "BUY"
+                elif not curr_above and prev_above:
+                    sig = "SELL"
+                
+                # Handle pandas Series float conversion
+                c_val = curr["Close"].item() if hasattr(curr["Close"], 'item') else float(curr["Close"])
+                s20 = curr["SMA_short"].item() if hasattr(curr["SMA_short"], 'item') else float(curr["SMA_short"])
+                s50 = curr["SMA_long"].item() if hasattr(curr["SMA_long"], 'item') else float(curr["SMA_long"])
+
+                all_rows.append({
+                    "Ticker": ticker,
+                    "Date": df.index[row_idx].strftime("%Y-%m-%d"),
+                    "Close Price": round(c_val, 2),
+                    "SMA_20": round(s20, 2),
+                    "SMA_50": round(s50, 2),
+                    "Currently In Position?": "YES (SMA20 > SMA50)" if curr_above else "NO",
+                    "New Signal Today": sig if sig else "-- no change --",
+                })
+        except Exception as e:
+            print(f"Error fetching history for {ticker}: {e}")
+    
+    # Sort history by Date descending
+    all_rows.sort(key=lambda x: x["Date"], reverse=True)
+    return all_rows
+
+
+
 if __name__ == '__main__':
     print(f"Signal Check — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print("=" * 70)
