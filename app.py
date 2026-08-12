@@ -1,5 +1,3 @@
-
-from fundamentals import results
 from spreadsheet import make_csv
 import csv
 import os
