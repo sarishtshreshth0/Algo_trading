@@ -21,8 +21,7 @@ def home():
             current = list(reader)
     
     # Fallback: compute last 30 days of historical signals live if CSV is missing/empty
-    if not current:
-        current = get_historical_signals(WATCHLIST, days=30)
+
 
     return render_template('index.html', data=current)
 
