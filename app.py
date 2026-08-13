@@ -1,10 +1,8 @@
-from spreadsheet import make_csv
 import csv
 import os
-# pyrefly: ignore [missing-import]
 from flask import Flask, render_template
-from trading import *
-from spreadsheet import * 
+from trading import run_trading
+
 app = Flask(__name__)
 
 # Use absolute path or fallback to script directory
@@ -13,20 +11,20 @@ CSV_PATH = os.path.join(BASE_DIR, 'trading_data.csv')
 
 @app.route('/')
 def home():
+    # Execute trading logic automatically to fetch fresh signals and update CSV
+    run_trading()
+
     current = []
-    make_csv(finals)
     if os.path.exists(CSV_PATH):
         with open(CSV_PATH, mode='r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             current = list(reader)
-    
-    # Fallback: compute last 30 days of historical signals live if CSV is missing/empty
-
 
     return render_template('index.html', data=current)
 
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
 
 
